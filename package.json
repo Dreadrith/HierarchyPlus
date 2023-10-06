@@ -1,0 +1,16 @@
+{
+  "name": "com.dreadscripts.hierarchyplus",
+  "displayName": "DreadTools - HierarchyPlus",
+  "version": "1.0.0",
+  "description": "A general improvement to the unity hierarchy such as component icons, guide lines, row coloring and settings for customization.",
+  "gitDependencies": {},
+  "vpmDependencies": {},
+  "author": {
+    "name": "Dreadrith",
+    "email": "dreadscripts@gmail.com",
+    "url": "https://www.dreadrith.com"
+  },
+  "legacyFolders": {},
+  "legacyFiles": {},
+  "type": "tool"
+}
