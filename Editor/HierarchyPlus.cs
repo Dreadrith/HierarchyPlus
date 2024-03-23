@@ -653,7 +653,7 @@ namespace DreadScripts.HierarchyPlus
         {            
             customIconCache.Clear();
             if (string.IsNullOrWhiteSpace(iconFolderPath)) return;
-            var paths = Directory.GetFiles(iconFolderPath).Where(p => !p.EndsWith(".meta"));
+            var paths = Directory.GetFiles(iconFolderPath, "*", SearchOption.AllDirectories).Where(p => !p.EndsWith(".meta"));
             foreach (var p in paths)
             {
                 Object icon = AssetDatabase.LoadAssetAtPath<Object>(p);
