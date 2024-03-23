@@ -656,11 +656,8 @@ namespace DreadScripts.HierarchyPlus
             var paths = Directory.GetFiles(iconFolderPath, "*", SearchOption.AllDirectories).Where(p => !p.EndsWith(".meta"));
             foreach (var p in paths)
             {
-                Object icon = AssetDatabase.LoadAssetAtPath<Object>(p);
-                if (icon is Texture2D texture)
-                {
-                    customIconCache.Add(texture.name, new GUIContent(texture, texture.name));
-                }
+	            Texture2D icon = AssetDatabase.LoadAssetAtPath<Texture2D>(p);
+                if (icon != null) customIconCache.Add(icon.name, new GUIContent(icon, icon.name));
             }
             
         }
