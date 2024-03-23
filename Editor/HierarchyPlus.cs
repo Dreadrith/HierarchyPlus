@@ -446,49 +446,28 @@ namespace DreadScripts.HierarchyPlus
 
         private static Rect DrawIconToggle(Rect rect, GameObject go)
         {
+	        bool faded = !go.activeSelf;
 	        if (LeftClicked(rect))
 	        {
 		        Undo.RecordObject(go, "[H+] Toggle GameObject");
-		        go.SetActive(!go.activeSelf);
+		        go.SetActive(faded);
 		        EditorUtility.SetDirty(go);
 	        }
 
-	        return DrawIcon(rect, go, !go.activeSelf);
+	        return DrawIcon(rect, go, faded);
         }
 
         private static Rect DrawIconToggle(Rect rect, Component c)
         {
-	        bool faded = false;
-            if (c is Behaviour b)
-            {
-	            faded = !b.enabled;
-	            if (LeftClicked(rect))
-	            {
-		            Undo.RecordObject(c, "[H+] Toggle Behaviour");
-		            b.enabled = !b.enabled;
-		            EditorUtility.SetDirty(c);
-	            }
-            } else if (c is Renderer r)
-			{
-	            faded = !r.enabled;
-	            if (LeftClicked(rect))
-	            {
-		            Undo.RecordObject(c, "[H+] Toggle Renderer");
-		            r.enabled = !r.enabled;
-		            EditorUtility.SetDirty(c);
-	            }
-			} else if (c is Collider col)
-			{
-	            faded = !col.enabled;
-	            if (LeftClicked(rect))
-	            {
-		            Undo.RecordObject(c, "[H+] Toggle Collider");
-		            col.enabled = !col.enabled;
-		            EditorUtility.SetDirty(c);
-	            }
-			}
-            
-            return DrawIcon(rect, c, faded);
+	        bool faded = !IsComponentEnabled(c);
+	        if (IsComponentToggleable(c) && LeftClicked(rect))
+	        {
+		        Undo.RecordObject(c, "[H+] Toggle Component");
+		        SetComponentEnabled(c, faded);
+		        EditorUtility.SetDirty(c);
+	        }
+
+	        return DrawIcon(rect, c, faded);
         }
         private static Rect DrawIcon(Rect rect, Component c, bool faded) => DrawIcon(GetIcon(c), rect, faded);
 
@@ -563,6 +542,21 @@ namespace DreadScripts.HierarchyPlus
         #endregion
         
         #region Functional Helpers
+        private static bool IsComponentToggleable(Component c) => c is Behaviour || c is Renderer || c is Collider;
+
+        private static bool IsComponentEnabled(Component c)
+        {
+	        if (!IsComponentToggleable(c)) return true;
+	        dynamic d = c;
+	        return d.enabled;
+        }
+
+        private static void SetComponentEnabled(Component c, bool enabled)
+        {
+	        if (!IsComponentToggleable(c)) return;
+	        dynamic d = c;
+	        d.enabled = enabled;
+        }
 
         private static int GetDepth(GameObject go) => GetDepth(go.transform);
         private static int GetDepth(Transform t)
