@@ -18,12 +18,15 @@ namespace DreadScripts.HierarchyPlus
         private const string PACKAGE_ICON_FOLDER_PATH = "CustomIcons";
         private const string MISSING_SCRIPT_ICON_NAME = "Missing";
         private const string DEFAULT_ICON_NAME = "Default";
+        private static int DRAG_TOGGLE_HOT_CONTROL_ID = "HierarchyPlusDragToggleId".GetHashCode();
         #endregion
         
         #region Variables
         private static readonly Dictionary<Type, GUIContent> iconCache = new Dictionary<Type, GUIContent>();
         private static readonly Dictionary<string, GUIContent> customIconCache = new Dictionary<string, GUIContent>();
         private static readonly Texture2D[] defaultTextures = new Texture2D[3];
+        private static readonly HashSet<Object> dragToggledObjects = new HashSet<Object>();
+        private static bool dragToggleNewState;
 
         private static MethodInfo GetGameObjectIconMethod;
         private static GUIContent gameObjectContent;
@@ -446,28 +449,36 @@ namespace DreadScripts.HierarchyPlus
 
         private static Rect DrawIconToggle(Rect rect, GameObject go)
         {
-	        bool faded = !go.activeSelf;
-	        if (LeftClicked(rect))
+	        bool newState = !go.activeSelf;
+	        bool leftClicked = LeftClicked(rect);
+	        if (leftClicked || MouseDraggedOver(rect, go))
 	        {
+		        if (leftClicked) StartDragToggling(newState);
 		        Undo.RecordObject(go, "[H+] Toggle GameObject");
-		        go.SetActive(faded);
+		        go.SetActive(dragToggleNewState);
 		        EditorUtility.SetDirty(go);
+		        dragToggledObjects.Add(go);
 	        }
 
-	        return DrawIcon(rect, go, faded);
+	        return DrawIcon(rect, go, newState);
         }
 
         private static Rect DrawIconToggle(Rect rect, Component c)
         {
-	        bool faded = !IsComponentEnabled(c);
-	        if (IsComponentToggleable(c) && LeftClicked(rect))
+	        bool newState = !IsComponentEnabled(c);
+	        if (!IsComponentToggleable(c)) return DrawIcon(rect, c, newState);
+	        
+	        bool leftClicked = LeftClicked(rect);
+	        if (leftClicked || MouseDraggedOver(rect, c))
 	        {
+		        if (leftClicked) StartDragToggling(newState);
 		        Undo.RecordObject(c, "[H+] Toggle Component");
-		        SetComponentEnabled(c, faded);
+		        SetComponentEnabled(c, dragToggleNewState);
 		        EditorUtility.SetDirty(c);
+		        dragToggledObjects.Add(c);
 	        }
 
-	        return DrawIcon(rect, c, faded);
+	        return DrawIcon(rect, c, newState);
         }
         private static Rect DrawIcon(Rect rect, Component c, bool faded) => DrawIcon(GetIcon(c), rect, faded);
 
@@ -583,6 +594,15 @@ namespace DreadScripts.HierarchyPlus
             bool clicked = e.type == EventType.MouseDown && e.button == 1 && rect.Contains(e.mousePosition);
             if (clicked) e.Use();
             return clicked;
+        }
+
+        private static bool MouseDraggedOver(Rect rect, Object o) => GUIUtility.hotControl == DRAG_TOGGLE_HOT_CONTROL_ID && rect.Contains(Event.current.mousePosition) && !dragToggledObjects.Contains(o);
+
+        private static void StartDragToggling(bool toggleToState)
+        {
+	        dragToggledObjects.Clear();
+	        dragToggleNewState = toggleToState;
+	        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
         }
         #endregion
 
