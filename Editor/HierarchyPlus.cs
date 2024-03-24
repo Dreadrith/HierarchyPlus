@@ -36,10 +36,10 @@ namespace DreadScripts.HierarchyPlus
         private static Vector2 scroll;
 
         private static bool
-	        colorsFoldout,
+	        colorsFoldout = true,
 	        mainColorsFoldout,
 	        miscColorsFolddout,
-	        iconsFoldout,
+	        iconsFoldout = true,
 	        coloredItemsFoldout,
 	        hiddenIconsFoldout,
 	        rowShadingFolout;
