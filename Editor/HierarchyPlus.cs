@@ -646,7 +646,9 @@ namespace DreadScripts.HierarchyPlus
         private static void InitializeSpecialIcons()
         {
 	        GetGameObjectIconMethod = typeof(EditorGUIUtility).GetMethod("GetIconForObject", BindingFlags.NonPublic | BindingFlags.Static );
-
+	        if (GetGameObjectIconMethod == null)
+		        GetGameObjectIconMethod = typeof(EditorGUIUtility).GetMethod("GetIconForObject", BindingFlags.Public | BindingFlags.Static );
+	        
 	        defaultTextures[0] = EditorGUIUtility.IconContent("cs Script Icon")?.image as Texture2D;
 	        defaultTextures[1] = EditorGUIUtility.IconContent("d_cs Script Icon")?.image as Texture2D;
 	        defaultTextures[2] = EditorGUIUtility.IconContent("dll Script Icon")?.image as Texture2D;
