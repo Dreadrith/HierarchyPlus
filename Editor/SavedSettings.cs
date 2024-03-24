@@ -458,7 +458,8 @@ namespace DreadScripts.HierarchyPlus
 			useCustomGameObjectIcon = new SavedBool(true),
 			showTransformIcon = new SavedBool(false),
 			showNonBehaviourIcons = new SavedBool(true),
-			linkCursorOnHover = new SavedBool(false);
+			linkCursorOnHover = new SavedBool(false),
+			dragToggle = new SavedBool(true);
 
 		[SerializeField] internal SavedFloat
 			guiXOffset = new SavedFloat(0);

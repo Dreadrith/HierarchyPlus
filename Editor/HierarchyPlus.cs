@@ -149,6 +149,7 @@ namespace DreadScripts.HierarchyPlus
 						        settings.showTransformIcon.DrawField("Show Transform Icon");
 						        settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
 						        settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
+						        settings.dragToggle.DrawField("Enable Drag-Toggling");
 						        settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
 						        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
 						        {
@@ -600,6 +601,7 @@ namespace DreadScripts.HierarchyPlus
 
         private static void StartDragToggling(bool toggleToState)
         {
+        	if (settings.dragToggle)
 	        dragToggledObjects.Clear();
 	        dragToggleNewState = toggleToState;
 	        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
