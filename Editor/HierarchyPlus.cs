@@ -36,10 +36,10 @@ namespace DreadScripts.HierarchyPlus
         private static Vector2 scroll;
 
         private static bool
-	        colorsFoldout,
+	        colorsFoldout = true,
 	        mainColorsFoldout,
 	        miscColorsFolddout,
-	        iconsFoldout,
+	        iconsFoldout = true,
 	        coloredItemsFoldout,
 	        hiddenIconsFoldout,
 	        rowShadingFolout;
@@ -52,160 +52,144 @@ namespace DreadScripts.HierarchyPlus
 			GetWindow<HierarchyPlus>($"{PRODUCT_NAME} Settings");
 		}
 
-        private void OnGUI()
-        {
-	        EditorGUI.BeginChangeCheck();
-	        scroll = EditorGUILayout.BeginScrollView(scroll);
-	        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-	        {
-		        using (new IndentScope())
-		        {
-			        using (new GUILayout.HorizontalScope())
-			        {
-				        settings.enabled.DrawField("HierarchyPlus Enabled");
-				        GUILayout.FlexibleSpace();
-				        GUILayout.Button(new GUIContent("Refresh Icons","Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false));
-					        InitializeAll();
-				        MakeRectLinkCursor();
-			        }
+		private void OnGUI()
+		{
+			EditorGUI.BeginChangeCheck();
+			scroll = EditorGUILayout.BeginScrollView(scroll);
+			
+			using (new GUILayout.HorizontalScope())
+			{
+				settings.enabled.DrawField("HierarchyPlus Enabled");
+				GUILayout.FlexibleSpace();
+				GUILayout.Button(new GUIContent("Refresh Icons", "Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false));
+				InitializeAll();
+				MakeRectLinkCursor();
+			}
 
-			        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-			        {
+			using (new GUILayout.VerticalScope(GUI.skin.box))
+			{
+				colorsFoldout = DrawFoldoutTitle("Colors", colorsFoldout, settings.colorsEnabled);
 
-				        using (new GUILayout.HorizontalScope())
-				        {
-					        Foldout("Colors", ref colorsFoldout);
-					        GUILayout.FlexibleSpace();
-					        settings.colorsEnabled.DrawToggle("Enabled", "Disabled", null, Color.green, Color.red);
-					        MakeRectLinkCursor();
-				        }
+				if (colorsFoldout)
+				{
+					using (new EditorGUI.DisabledScope(!settings.GetColorsEnabled()))
+					{
+						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+							if (Foldout("Main", ref mainColorsFoldout))
+							{
+								using (new IndentScope())
+								{
+									DrawColorSetting("Active Icon Tint", settings.iconTintColor);
+									DrawColorSetting("Inactive Icon Tint", settings.iconFadedTintColor);
+									DrawColorSetting("Guide Lines", settings.guideLinesColor, settings.guideLinesEnabled);
+								}
+							}
 
-				        if (colorsFoldout)
-				        {
-					        using (new IndentScope())
-					        using (new EditorGUI.DisabledScope(!settings.GetColorsEnabled()))
-					        {
-						        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-							        if (Foldout("Main", ref mainColorsFoldout))
-							        {
-								        using (new IndentScope())
-								        {
-									        DrawColorSetting("Active Icon Tint", settings.iconTintColor);
-									        DrawColorSetting("Inactive Icon Tint", settings.iconFadedTintColor);
-									        DrawColorSetting("Guide Lines", settings.guideLinesColor, settings.guideLinesEnabled);
-								        }
-							        }
 
-						        
-						        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-						        {
-							        Foldout("Row Coloring", ref rowShadingFolout);
-							        if (rowShadingFolout)
-							        {
-								        using (new IndentScope())
-								        {
-									        DrawColorSetting("Odd Color", settings.rowOddColor, settings.rowColoringOddEnabled);
-									        DrawColorSetting("Even Color", settings.rowEvenColor, settings.rowColoringEvenEnabled);
-								        }
-							        }
-						        }
+						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+						{
+							Foldout("Row Coloring", ref rowShadingFolout);
+							if (rowShadingFolout)
+							{
+								using (new IndentScope())
+								{
+									DrawColorSetting("Odd Color", settings.rowOddColor, settings.rowColoringOddEnabled);
+									DrawColorSetting("Even Color", settings.rowEvenColor, settings.rowColoringEvenEnabled);
+								}
+							}
+						}
 
-						        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-						        {
-							        Foldout("Misc", ref miscColorsFolddout);
-							        if (miscColorsFolddout)
-								        using (new IndentScope())
-								        {
-									        DrawColorSetting("Misc 1", settings.colorOne, settings.colorOneEnabled);
-									        DrawColorSetting("Misc 2", settings.colorTwo, settings.colorTwoEnabled);
-									        DrawColorSetting("Misc 3", settings.colorThree, settings.colorThreeEnabled);
-								        }
-						        }
+						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+						{
+							Foldout("Misc", ref miscColorsFolddout);
+							if (miscColorsFolddout)
+								using (new IndentScope())
+								{
+									DrawColorSetting("Misc 1", settings.colorOne, settings.colorOneEnabled);
+									DrawColorSetting("Misc 2", settings.colorTwo, settings.colorTwoEnabled);
+									DrawColorSetting("Misc 3", settings.colorThree, settings.colorThreeEnabled);
+								}
+						}
 
-					        }
+					}
 
-				        }
-			        }
+				}
+			}
 
-			        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-			        {
-				        using (new GUILayout.HorizontalScope())
-				        {
-					        Foldout("Components", ref iconsFoldout);
-					        GUILayout.FlexibleSpace();
-					        settings.iconsEnabled.DrawToggle("Enabled", "Disabled", null, Color.green, Color.red);
-					        MakeRectLinkCursor();
-				        }
+			using (new GUILayout.VerticalScope(GUI.skin.box))
+			{
+				iconsFoldout = DrawFoldoutTitle("Components", iconsFoldout, settings.iconsEnabled);
 
-				        using (new IndentScope())
-				        using (new EditorGUI.DisabledScope(!settings.GetIconsEnabled()))
-					        if (iconsFoldout) using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-					        {
-						        EditorGUIUtility.labelWidth = 200;
-						        settings.enableContextClick.DrawField("Enable Context Click");
-						        settings.showGameObjectIcon.DrawField("Show GameObject Icon");
-						        using (new EditorGUI.DisabledScope(!settings.showGameObjectIcon))
-							        settings.useCustomGameObjectIcon.DrawField("Use Custom GameObject Icon");
-						        settings.showTransformIcon.DrawField("Show Transform Icon");
-						        settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
-						        settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
-						        settings.dragToggle.DrawField("Enable Drag-Toggling");
-						        settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
-						        using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-						        {
-							        Foldout(new GUIContent("Hidden Types","Hover over an icon to see its type name.\nWrite the type name here to hide the icon from the hierarchy view."), ref hiddenIconsFoldout);
-							        if (hiddenIconsFoldout)
-							        {
-								        using (new IndentScope())
-								        {
-									        for (int i = 0; i < settings.hiddenIconTypes.Length; i++)
-									        {
-										        using (new EditorGUILayout.HorizontalScope())
-										        {
-											        settings.hiddenIconTypes[i].DrawField(GUIContent.none);
-											        if (GUILayout.Button("X", EditorStyles.boldLabel, GUILayout.ExpandWidth(false)))
-											        {
-												        var arr = settings.hiddenIconTypes;
-												        ArrayUtility.RemoveAt(ref arr, i);
-												        settings.hiddenIconTypes = arr;
-												        SavedSettings.Save();
-												        i--;
-											        }
-											        MakeRectLinkCursor();
-										        }
-									        }
+				if (iconsFoldout)
+				{
+					using (new EditorGUI.DisabledScope(!settings.GetIconsEnabled()))
+					using (new GUILayout.VerticalScope())
+					{
+						EditorGUIUtility.labelWidth = 200;
+						settings.enableContextClick.DrawField("Enable Context Click");
+						settings.showGameObjectIcon.DrawField("Show GameObject Icon");
+						using (new EditorGUI.DisabledScope(!settings.showGameObjectIcon))
+							settings.useCustomGameObjectIcon.DrawField("Use Custom GameObject Icon");
+						settings.showTransformIcon.DrawField("Show Transform Icon");
+						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
+						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
+            settings.dragToggle.DrawField("Enable Drag-Toggling");
+						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
+						using (new GUILayout.VerticalScope())
+						{
+							Foldout(new GUIContent("Hidden Types", "Hover over an icon to see its type name.\nWrite the type name here to hide the icon from the hierarchy view."), ref hiddenIconsFoldout);
+							if (hiddenIconsFoldout)
+							{
+								using (new IndentScope())
+								{
+									for (int i = 0; i < settings.hiddenIconTypes.Length; i++)
+									{
+										using (new EditorGUILayout.HorizontalScope())
+										{
+											settings.hiddenIconTypes[i].DrawField(GUIContent.none);
+											if (GUILayout.Button("X", EditorStyles.boldLabel, GUILayout.ExpandWidth(false)))
+											{
+												var arr = settings.hiddenIconTypes;
+												ArrayUtility.RemoveAt(ref arr, i);
+												settings.hiddenIconTypes = arr;
+												SavedSettings.Save();
+												i--;
+											}
 
-									        if (GUILayout.Button("+", EditorStyles.toolbarButton))
-									        {
-										        var arr = settings.hiddenIconTypes;
-										        ArrayUtility.Add(ref arr, new SavedString(""));
-										        settings.hiddenIconTypes = arr;
-										        SavedSettings.Save();
-									        }
-									        MakeRectLinkCursor();
-								        }
-							        }
-						        }
+											MakeRectLinkCursor();
+										}
+									}
 
-						        EditorGUIUtility.labelWidth = 0;
-					        }
-			        }
-		        }
-	        }
-	        
-	        EditorGUILayout.EndScrollView();
-	        using (new GUILayout.HorizontalScope())
-	        {
-		        GUILayout.FlexibleSpace();
-		        w_Credit();
-	        }
+									if (GUILayout.Button("+", EditorStyles.toolbarButton))
+									{
+										var arr = settings.hiddenIconTypes;
+										ArrayUtility.Add(ref arr, new SavedString(""));
+										settings.hiddenIconTypes = arr;
+										SavedSettings.Save();
+									}
 
-	        if (EditorGUI.EndChangeCheck())
-		        EditorApplication.RepaintHierarchyWindow();
-	        
-        }
-        
-        private static void w_Credit()
+									MakeRectLinkCursor();
+								}
+							}
+						}
+
+						EditorGUIUtility.labelWidth = 0;
+					}
+				}
+			}
+			
+			EditorGUILayout.EndScrollView();
+			using (new GUILayout.HorizontalScope())
+			{
+				GUILayout.FlexibleSpace();
+				w_Credit();
+			}
+
+			if (EditorGUI.EndChangeCheck())
+				EditorApplication.RepaintHierarchyWindow();
+		}
+    
+		private static void w_Credit()
         {
 	        using (new ColoredScope(ColoredScope.ColoringType.BG, Color.clear))
 	        {
@@ -424,11 +408,29 @@ namespace DreadScripts.HierarchyPlus
 
         private static bool Foldout(GUIContent label, ref bool b)
         {
-	        return b = EditorGUILayout.Foldout(b, label);
+	        return b = EditorGUILayout.Foldout(b, label, true);
         }
-        private static bool Foldout(string label, ref bool b)
+
+        private static bool Foldout(string label, ref bool b) => Foldout(new GUIContent(label), ref b);
+
+        private static bool DrawFoldoutTitle(string label, bool foldout, SavedBool enabled)
         {
-	        return b = EditorGUILayout.Foldout(b, label);
+	        using (new GUILayout.HorizontalScope())
+	        {
+		        var r = EditorGUILayout.GetControlRect(false, 24, Styles.bigTitle, GUILayout.ExpandWidth(true));
+		        GUI.Label(r, label, EditorStyles.whiteLargeLabel);
+
+		        if (enabled != null)
+		        {
+			        enabled.DrawToggle("Enabled", "Disabled", null, pastelGreenColor, pastelRedColor, GUILayout.ExpandWidth(false));
+			        MakeRectLinkCursor();
+		        }
+
+		        if (LeftClicked(r)) foldout = !foldout;
+		        MakeRectLinkCursor(r);
+	        }
+
+	        return foldout;
         }
         private static void DrawColorSetting(string label, SavedColor color, SavedBool toggle = null)
         {
@@ -437,7 +439,7 @@ namespace DreadScripts.HierarchyPlus
 		        if (toggle != null)
 		        {
 			        GUIContent toggleTooltip = toggle ? new GUIContent("","Enabled") : new GUIContent("","Disabled");
-			        toggle.DrawToggle(toggleTooltip, null, EditorStyles.radioButton, linkColor, pastelRedColor, GUILayout.Width(18), GUILayout.Height(18));
+			        toggle.DrawToggle(toggleTooltip, null, EditorStyles.radioButton, pastelGreenColor, Color.grey, GUILayout.Width(18), GUILayout.Height(18));
 			        var r = GUILayoutUtility.GetLastRect();
 			        EditorGUIUtility.AddCursorRect(r, MouseCursor.Link);
 		        } else using (new EditorGUI.DisabledScope(true))
