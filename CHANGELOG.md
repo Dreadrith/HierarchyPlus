@@ -1,3 +1,12 @@
+(v1.2.1)
+--------
+- [Feature] Added an option to enable/disable Drag-Toggle
+- [Fix] Fixed Drag-Toggle sometimes affecting adjacent icons
+- [Fix] Fixed GameObject icons not being used in Unity 2022
+- [Fix] Fixed Refresh Icons button not doing anything and instead constantly refreshing while settings window was open.
+- [UI] Revamped the settings window
+- [Misc] Thanks to @JustBuddy for various help.
+
 (v1.2.0)
 --------
 - [Feature] You can now click drag on components to toggle them.
