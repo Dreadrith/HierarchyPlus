@@ -18,7 +18,7 @@ namespace DreadScripts.HierarchyPlus
         private const string PACKAGE_ICON_FOLDER_PATH = "CustomIcons";
         private const string MISSING_SCRIPT_ICON_NAME = "Missing";
         private const string DEFAULT_ICON_NAME = "Default";
-        private static int DRAG_TOGGLE_HOT_CONTROL_ID = "HierarchyPlusDragToggleId".GetHashCode();
+        private static readonly int DRAG_TOGGLE_HOT_CONTROL_ID = "HierarchyPlusDragToggleId".GetHashCode();
         #endregion
         
         #region Variables
@@ -599,7 +599,11 @@ namespace DreadScripts.HierarchyPlus
             return clicked;
         }
 
-        private static bool MouseDraggedOver(Rect rect, Object o) => GUIUtility.hotControl == DRAG_TOGGLE_HOT_CONTROL_ID && rect.Contains(Event.current.mousePosition) && !dragToggledObjects.Contains(o);
+        private static bool MouseDraggedOver(Rect rect, Object o)
+        {
+	        var e = Event.current;
+	        return GUIUtility.hotControl == DRAG_TOGGLE_HOT_CONTROL_ID && e.type != EventType.Layout && rect.Contains(e.mousePosition) && !dragToggledObjects.Contains(o);
+        }
 
         private static void StartDragToggling(bool toggleToState)
         {
