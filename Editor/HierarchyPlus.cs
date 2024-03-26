@@ -61,8 +61,8 @@ namespace DreadScripts.HierarchyPlus
 			{
 				settings.enabled.DrawField("HierarchyPlus Enabled");
 				GUILayout.FlexibleSpace();
-				GUILayout.Button(new GUIContent("Refresh Icons", "Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false));
-				InitializeAll();
+				if (GUILayout.Button(new GUIContent("Refresh Icons", "Use this to update the icons in the hierarchy window."), GUI.skin.button, GUILayout.ExpandWidth(false))) 
+					InitializeAll();
 				MakeRectLinkCursor();
 			}
 
