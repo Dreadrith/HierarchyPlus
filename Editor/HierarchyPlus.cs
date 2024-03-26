@@ -127,13 +127,13 @@ namespace DreadScripts.HierarchyPlus
 					{
 						EditorGUIUtility.labelWidth = 200;
 						settings.enableContextClick.DrawField("Enable Context Click");
+						settings.enableDragToggle.DrawField("Enable Drag-Toggle");
 						settings.showGameObjectIcon.DrawField("Show GameObject Icon");
 						using (new EditorGUI.DisabledScope(!settings.showGameObjectIcon))
 							settings.useCustomGameObjectIcon.DrawField("Use Custom GameObject Icon");
 						settings.showTransformIcon.DrawField("Show Transform Icon");
 						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
 						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
-            					settings.dragToggle.DrawField("Enable Drag-Toggling");
 						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
 						using (new GUILayout.VerticalScope())
 						{
@@ -603,10 +603,10 @@ namespace DreadScripts.HierarchyPlus
 
         private static void StartDragToggling(bool toggleToState)
         {
-        	if (settings.dragToggle)
 	        dragToggledObjects.Clear();
 	        dragToggleNewState = toggleToState;
-	        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
+	        if (settings.enableDragToggle) 
+		        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
         }
         #endregion
 
