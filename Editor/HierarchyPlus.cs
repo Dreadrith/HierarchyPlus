@@ -127,6 +127,7 @@ namespace DreadScripts.HierarchyPlus
 					{
 						EditorGUIUtility.labelWidth = 200;
 						settings.enableContextClick.DrawField("Enable Context Click");
+						settings.enableDragToggle.DrawField("Enable Drag-Toggle");
 						settings.showGameObjectIcon.DrawField("Show GameObject Icon");
 						using (new EditorGUI.DisabledScope(!settings.showGameObjectIcon))
 							settings.useCustomGameObjectIcon.DrawField("Use Custom GameObject Icon");
@@ -186,9 +187,8 @@ namespace DreadScripts.HierarchyPlus
 
 			if (EditorGUI.EndChangeCheck())
 				EditorApplication.RepaintHierarchyWindow();
-
 		}
-
+    
 		private static void w_Credit()
         {
 	        using (new ColoredScope(ColoredScope.ColoringType.BG, Color.clear))
@@ -605,7 +605,8 @@ namespace DreadScripts.HierarchyPlus
         {
 	        dragToggledObjects.Clear();
 	        dragToggleNewState = toggleToState;
-	        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
+	        if (settings.enableDragToggle) 
+		        GUIUtility.hotControl = DRAG_TOGGLE_HOT_CONTROL_ID;
         }
         #endregion
 

@@ -448,6 +448,7 @@ namespace DreadScripts.HierarchyPlus
 			colorsEnabled = new SavedBool(true),
 			iconsEnabled = new SavedBool(true),
 			enableContextClick = new SavedBool(true),
+			enableDragToggle = new SavedBool(true),
 			colorOneEnabled = new SavedBool(false),
 			colorTwoEnabled = new SavedBool(false),
 			colorThreeEnabled = new SavedBool(false),
@@ -459,7 +460,7 @@ namespace DreadScripts.HierarchyPlus
 			showTransformIcon = new SavedBool(false),
 			showNonBehaviourIcons = new SavedBool(true),
 			linkCursorOnHover = new SavedBool(false);
-
+		
 		[SerializeField] internal SavedFloat
 			guiXOffset = new SavedFloat(0);
 
