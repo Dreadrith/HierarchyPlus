@@ -62,7 +62,7 @@ namespace DreadScripts.HierarchyPlus
 
 				string rawData = dataBuilder.ToString();
 				string compressedData = CompressString(rawData);
-				PlayerPrefs.SetString(PrefsKey, compressedData);
+				EditorPrefs.SetString(PrefsKey, compressedData);
 			}
 		}
 
@@ -71,8 +71,7 @@ namespace DreadScripts.HierarchyPlus
 			try
 			{
 				string fullData = string.Empty;
-
-				fullData = PlayerPrefs.GetString(PrefsKey, string.Empty);
+				fullData = EditorPrefs.GetString(PrefsKey, string.Empty);
 				if (!string.IsNullOrWhiteSpace(fullData))
 					fullData = DecompressString(fullData);
 
