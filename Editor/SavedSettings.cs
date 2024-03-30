@@ -18,7 +18,6 @@ namespace DreadScripts.HierarchyPlus
 		internal static SavedSettings settings => data;
 
 		private const string PrefsKey = "HierarchyPlusSettingsJSON";
-		private const bool isEditor = true;
 
 		#region Main
 
@@ -63,8 +62,7 @@ namespace DreadScripts.HierarchyPlus
 
 				string rawData = dataBuilder.ToString();
 				string compressedData = CompressString(rawData);
-				if (isEditor) EditorPrefs.SetString(PrefsKey, compressedData);
-				else PlayerPrefs.SetString(PrefsKey, compressedData);
+				EditorPrefs.SetString(PrefsKey, compressedData);
 			}
 		}
 
@@ -73,11 +71,7 @@ namespace DreadScripts.HierarchyPlus
 			try
 			{
 				string fullData = string.Empty;
-
-				if (isEditor && EditorPrefs.HasKey(PrefsKey))
-					fullData = EditorPrefs.GetString(PrefsKey, string.Empty);
-				else if (!isEditor && PlayerPrefs.HasKey(PrefsKey))
-					fullData = PlayerPrefs.GetString(PrefsKey, string.Empty);
+				fullData = EditorPrefs.GetString(PrefsKey, string.Empty);
 				if (!string.IsNullOrWhiteSpace(fullData))
 					fullData = DecompressString(fullData);
 
