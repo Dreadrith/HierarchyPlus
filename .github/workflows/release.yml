@@ -45,7 +45,21 @@ jobs:
         run: |
           echo "zipFile=${{ env.packageFileName }}_v${{ steps.version.outputs.value }}_VPM".zip >> $GITHUB_ENV
           echo "unityPackage=${{ env.packageFileName }}_v${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
-
+    
+      - name: Set ZIP Url
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: ./package.json
+          field: url
+          value: 'https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.prop }}/${{ env.zipFile }}'
+          
+      - name: Set UnityPackage Url
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: ./package.json
+          field: unityPackage
+          value: 'https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.prop }}/${{ env.unityPackage }}'
+          
       - name: Create directory and move files
         if: ${{ steps.checkReleaseTag.outputs.exists == 'false' }}
         run: |
