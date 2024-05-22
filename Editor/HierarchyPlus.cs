@@ -135,7 +135,7 @@ namespace DreadScripts.HierarchyPlus
 						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
 						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
 						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
-						settings.alwaysShowIcons.DrawField("Show Icons over Names");
+						settings.alwaysShowIcons.DrawField("Display Icons Over Names");
 						using (new GUILayout.VerticalScope())
 						{
 							Foldout(new GUIContent("Hidden Types", "Hover over an icon to see its type name.\nWrite the type name here to hide the icon from the hierarchy view."), ref hiddenIconsFoldout);
