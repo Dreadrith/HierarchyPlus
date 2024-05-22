@@ -346,13 +346,15 @@ namespace DreadScripts.HierarchyPlus
 			        if (settings.alwaysShowIcons)
 			        {
 			        	iconsAreaWidth = 36;
+			        	return true;
 			        }
 			        else
 			        {
 			        	iconsAreaWidth -= 18;
+			        	return canDraw;
 			    	}
 
-			        return canDraw;
+			        
 		        }
 
 		        if (settings.showGameObjectIcon && CanDrawIcon())
