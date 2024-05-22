@@ -135,6 +135,7 @@ namespace DreadScripts.HierarchyPlus
 						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
 						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
 						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
+						settings.alwaysShowIcons.DrawField("Show Icons over Names");
 						using (new GUILayout.VerticalScope())
 						{
 							Foldout(new GUIContent("Hidden Types", "Hover over an icon to see its type name.\nWrite the type name here to hide the icon from the hierarchy view."), ref hiddenIconsFoldout);
@@ -335,14 +336,22 @@ namespace DreadScripts.HierarchyPlus
 		        {
 			        bool dotsOnly = iconsAreaWidth < 36;
 			        bool canDraw = iconsAreaWidth > 18;
-			        if (canDraw && dotsOnly)
+			        if (canDraw && dotsOnly && !settings.alwaysShowIcons)
 			        {
 				        GUI.Label(iconRect, "...", EditorStyles.centeredGreyMiniLabel);
 				        iconsAreaWidth -= 18;
 				        return false;
 			        }
+			        
+			        if (settings.alwaysShowIcons)
+			        {
+			        	iconsAreaWidth = 36;
+			        }
+			        else
+			        {
+			        	iconsAreaWidth -= 18;
+			    	}
 
-			        iconsAreaWidth -= 18;
 			        return canDraw;
 		        }
 
