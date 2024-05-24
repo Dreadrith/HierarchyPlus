@@ -133,6 +133,7 @@ namespace DreadScripts.HierarchyPlus
 							settings.useCustomGameObjectIcon.DrawField("Use Custom GameObject Icon");
 						settings.showTransformIcon.DrawField("Show Transform Icon");
 						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
+						settings.alwaysShowIcons.DrawField("Always Render Icons");
 						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
 						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
 						using (new GUILayout.VerticalScope())
@@ -333,6 +334,7 @@ namespace DreadScripts.HierarchyPlus
 
 		        bool CanDrawIcon()
 		        {
+			        if (settings.alwaysShowIcons) return true;
 			        bool dotsOnly = iconsAreaWidth < 36;
 			        bool canDraw = iconsAreaWidth > 18;
 			        if (canDraw && dotsOnly)
@@ -341,9 +343,10 @@ namespace DreadScripts.HierarchyPlus
 				        iconsAreaWidth -= 18;
 				        return false;
 			        }
-
+			        
 			        iconsAreaWidth -= 18;
 			        return canDraw;
+			    	
 		        }
 
 		        if (settings.showGameObjectIcon && CanDrawIcon())
