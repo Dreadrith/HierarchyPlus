@@ -435,7 +435,8 @@ namespace DreadScripts.HierarchyPlus
 			colorThree = new SavedColor(Color.white),
 			guideLinesColor = new SavedColor(Color.white),
 			iconTintColor = new SavedColor(Color.white),
-			iconFadedTintColor = new SavedColor(new Color(1, 1, 1, 0.5f));
+			iconFadedTintColor = new SavedColor(new Color(1, 1, 1, 0.5f)),
+			iconBackgroundColor = new SavedColor(new Color(0.22f, 0.22f, 0.22f));
 
 		[SerializeField] internal SavedBool
 			enabled = new SavedBool(true),
@@ -454,7 +455,9 @@ namespace DreadScripts.HierarchyPlus
 			showTransformIcon = new SavedBool(false),
 			showNonBehaviourIcons = new SavedBool(true),
 			linkCursorOnHover = new SavedBool(false),
-			alwaysShowIcons = new SavedBool(false);
+			alwaysShowIcons = new SavedBool(false),
+			iconBackgroundColorEnabled = new SavedBool(true),
+			iconBackgroundOverlapOnly = new SavedBool(true);
 		
 		[SerializeField] internal SavedFloat
 			guiXOffset = new SavedFloat(0);

@@ -82,6 +82,16 @@ namespace DreadScripts.HierarchyPlus
 									DrawColorSetting("Active Icon Tint", settings.iconTintColor);
 									DrawColorSetting("Inactive Icon Tint", settings.iconFadedTintColor);
 									DrawColorSetting("Guide Lines", settings.guideLinesColor, settings.guideLinesEnabled);
+									DrawColorSetting("Icon Background", settings.iconBackgroundColor, settings.iconBackgroundColorEnabled);
+									using (new GUILayout.HorizontalScope())
+									{
+										var toggle = settings.iconBackgroundOverlapOnly;
+										GUIContent toggleTooltip = toggle ? new GUIContent(string.Empty, "Enabled") : new GUIContent(string.Empty, "Disabled");
+										toggle.DrawToggle(toggleTooltip, null, EditorStyles.radioButton, pastelGreenColor, Color.grey, GUILayout.Width(18), GUILayout.Height(18));
+										var r = GUILayoutUtility.GetLastRect();
+										EditorGUIUtility.AddCursorRect(r, MouseCursor.Link);
+										GUILayout.Label("Icon Background On Overlap Only", EditorStyles.label);
+									}
 								}
 							}
 
@@ -332,12 +342,14 @@ namespace DreadScripts.HierarchyPlus
 		        //iconRect = DrawIcon(typeof(GameObject), iconRect);
 		        float iconsAreaWidth = rect.width - 32 + settings.guiXOffset - go.name.Length * 6.1f;
 
-		        bool CanDrawIcon()
+		        bool CanDrawIcon(out bool drawBackground)
 		        {
-			        if (settings.alwaysShowIcons) return true;
 			        bool dotsOnly = iconsAreaWidth < 36;
-			        bool canDraw = iconsAreaWidth > 18;
-			        if (canDraw && dotsOnly)
+			        bool overlapping = iconsAreaWidth < 18;
+			        bool drawIcon = settings.alwaysShowIcons || (!dotsOnly && !overlapping);
+			        drawBackground = drawIcon && settings.iconBackgroundColorEnabled && (overlapping || !settings.iconBackgroundOverlapOnly);
+			        
+			        if (!drawIcon && dotsOnly)
 			        {
 				        GUI.Label(iconRect, "...", EditorStyles.centeredGreyMiniLabel);
 				        iconsAreaWidth -= 18;
@@ -345,12 +357,12 @@ namespace DreadScripts.HierarchyPlus
 			        }
 			        
 			        iconsAreaWidth -= 18;
-			        return canDraw;
-			    	
+			        return drawIcon;
+
 		        }
 
-		        if (settings.showGameObjectIcon && CanDrawIcon())
-			        iconRect = DrawIconToggle(iconRect, go);
+		        if (settings.showGameObjectIcon && CanDrawIcon(out bool withBg))
+			        iconRect = DrawIconToggle(iconRect, go, withBg);
 
 		        bool isFirstComponent = true;
 		        foreach (var c in go.GetComponents<Component>())
@@ -373,10 +385,10 @@ namespace DreadScripts.HierarchyPlus
 				        if (!isFirstComponent && settings.hiddenIconTypes.Any(ss => ss.value == c.GetType().Name)) continue;
 			        }
 
-			        if (CanDrawIcon())
+			        if (CanDrawIcon(out bool withBg2))
 			        {
 				        Rect nextRect = iconRect;
-				        iconRect = DrawIconToggle(iconRect, c);
+				        iconRect = DrawIconToggle(iconRect, c, withBg2);
 				        Event e = Event.current;
 				        if (settings.enableContextClick && e.type == EventType.MouseDown && e.button == 1 && nextRect.Contains(e.mousePosition))
 				        {
@@ -453,7 +465,7 @@ namespace DreadScripts.HierarchyPlus
 	        }
         }
 
-        private static Rect DrawIconToggle(Rect rect, GameObject go)
+        private static Rect DrawIconToggle(Rect rect, GameObject go, bool withBackground)
         {
 	        bool newState = !go.activeSelf;
 	        bool leftClicked = LeftClicked(rect);
@@ -466,13 +478,13 @@ namespace DreadScripts.HierarchyPlus
 		        dragToggledObjects.Add(go);
 	        }
 
-	        return DrawIcon(rect, go, newState);
+	        return DrawIcon(rect, go, newState, withBackground);
         }
 
-        private static Rect DrawIconToggle(Rect rect, Component c)
+        private static Rect DrawIconToggle(Rect rect, Component c, bool withBackgroun)
         {
 	        bool newState = !IsComponentEnabled(c);
-	        if (!IsComponentToggleable(c)) return DrawIcon(rect, c, newState);
+	        if (!IsComponentToggleable(c)) return DrawIcon(rect, c, newState, withBackgroun);
 	        
 	        bool leftClicked = LeftClicked(rect);
 	        if (leftClicked || MouseDraggedOver(rect, c))
@@ -484,11 +496,11 @@ namespace DreadScripts.HierarchyPlus
 		        dragToggledObjects.Add(c);
 	        }
 
-	        return DrawIcon(rect, c, newState);
+	        return DrawIcon(rect, c, newState, withBackgroun);
         }
-        private static Rect DrawIcon(Rect rect, Component c, bool faded) => DrawIcon(GetIcon(c), rect, faded);
+        private static Rect DrawIcon(Rect rect, Component c, bool faded, bool withBackground) => DrawIcon(GetIcon(c), rect, faded, withBackground);
 
-        private static Rect DrawIcon(Rect rect, GameObject go, bool faded)
+        private static Rect DrawIcon(Rect rect, GameObject go, bool faded, bool withBackground)
         {
 	        GUIContent goContent = gameObjectContent;
 	        if (settings.useCustomGameObjectIcon && GetGameObjectIconMethod != null)
@@ -496,13 +508,14 @@ namespace DreadScripts.HierarchyPlus
 		        Texture2D icon = GetGameObjectIconMethod.Invoke(null, new object[] { go }) as Texture2D;
 		        if (icon != null) goContent = new GUIContent(goContent){image = icon};
 	        }
-	        return DrawIcon(goContent, rect, faded);
+	        return DrawIcon(goContent, rect, faded, withBackground);
         }
         
-        private static Rect DrawIcon(GUIContent content, Rect rect, bool faded)
+        private static Rect DrawIcon(GUIContent content, Rect rect, bool faded, bool withBackground)
         {
 	        using (new ColoredScope(ColoredScope.ColoringType.All, faded, settings.iconFadedTintColor, settings.iconTintColor))
 	        {
+		        if (withBackground) EditorGUI.DrawRect(rect, settings.iconBackgroundColor);
 		        GUI.Label(rect, content);
 		        if (settings.linkCursorOnHover)
 			        MakeRectLinkCursor(rect);
