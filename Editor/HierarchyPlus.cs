@@ -334,25 +334,19 @@ namespace DreadScripts.HierarchyPlus
 
 		        bool CanDrawIcon()
 		        {
+			        if (settings.alwaysShowIcons) return true;
 			        bool dotsOnly = iconsAreaWidth < 36;
 			        bool canDraw = iconsAreaWidth > 18;
-			        if (canDraw && dotsOnly && !settings.alwaysShowIcons)
+			        if (canDraw && dotsOnly)
 			        {
 				        GUI.Label(iconRect, "...", EditorStyles.centeredGreyMiniLabel);
 				        iconsAreaWidth -= 18;
 				        return false;
 			        }
 			        
-			        if (settings.alwaysShowIcons)
-			        {
-			        	iconsAreaWidth = 36;
-			        	return true;
-			        }
-			        else
-			        {
-			        	iconsAreaWidth -= 18;
-			        	return canDraw;
-			    	}
+			        iconsAreaWidth -= 18;
+			        return canDraw;
+			    	
 		        }
 
 		        if (settings.showGameObjectIcon && CanDrawIcon())
