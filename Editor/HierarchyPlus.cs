@@ -347,7 +347,7 @@ namespace DreadScripts.HierarchyPlus
 			        bool dotsOnly = iconsAreaWidth < 36;
 			        bool overlapping = iconsAreaWidth < 18;
 			        bool drawIcon = settings.alwaysShowIcons || (!dotsOnly && !overlapping);
-			        drawBackground = drawIcon && settings.iconBackgroundColorEnabled && (overlapping || !settings.iconBackgroundOverlapOnly);
+			        drawBackground = drawIcon && settings.colorsEnabled && settings.iconBackgroundColorEnabled && (overlapping || !settings.iconBackgroundOverlapOnly);
 			        
 			        if (!drawIcon && dotsOnly)
 			        {
