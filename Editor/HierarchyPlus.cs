@@ -334,29 +334,29 @@ namespace DreadScripts.HierarchyPlus
 
 	        if (settings.GetIconsEnabled())
 	        {
-		        Rect iconRect = rect;
-		        iconRect.x += settings.guiXOffset;
-		        iconRect.width -= settings.guiXOffset;
-		        iconRect.x = rect.xMax - 32 + settings.guiXOffset;
+		        float nameAdjust = GUI.skin.label.CalcSize(new GUIContent(go.name)).x + 18;
+		        Rect availableArea = new Rect(rect) {width = rect.width - 32 + settings.guiXOffset - nameAdjust};
+		        availableArea.x += nameAdjust;
+
+		        Rect iconRect = availableArea;
+		        iconRect.x = availableArea.xMax - 18;
 		        iconRect.width = 18;
-		        //iconRect = DrawIcon(typeof(GameObject), iconRect);
-		        float iconsAreaWidth = rect.width - 32 + settings.guiXOffset - go.name.Length * 6.1f;
 
 		        bool CanDrawIcon(out bool drawBackground)
 		        {
-			        bool dotsOnly = iconsAreaWidth < 36;
-			        bool overlapping = iconsAreaWidth < 18;
+			        bool dotsOnly = availableArea.width < 36;
+			        bool overlapping = availableArea.width < 18;
 			        bool drawIcon = settings.alwaysShowIcons || (!dotsOnly && !overlapping);
 			        drawBackground = drawIcon && settings.colorsEnabled && settings.iconBackgroundColorEnabled && (overlapping || !settings.iconBackgroundOverlapOnly);
 			        
 			        if (!drawIcon && dotsOnly)
 			        {
 				        GUI.Label(iconRect, "...", EditorStyles.centeredGreyMiniLabel);
-				        iconsAreaWidth -= 18;
+				        availableArea.width -= 18;
 				        return false;
 			        }
 			        
-			        iconsAreaWidth -= 18;
+			        availableArea.width -= 18;
 			        return drawIcon;
 
 		        }
