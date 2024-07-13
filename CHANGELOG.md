@@ -1,3 +1,9 @@
+(v1.3.0)
+--------
+- [Feature] Added labels for GameObject Tag & Layer. Customizable in settings.
+- [Feature] Added Custom Icons for VRC Constraints. Thanks to @JustBuddy
+- [Misc] Set minimal Unity version
+
 (v1.2.1)
 --------
 - [Feature] Added an option to enable/disable Drag-Toggle
