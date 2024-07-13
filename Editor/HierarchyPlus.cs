@@ -794,6 +794,8 @@ namespace DreadScripts.HierarchyPlus
             EditorApplication.hierarchyWindowItemOnGUI = OnHierarchyItemGUI + EditorApplication.hierarchyWindowItemOnGUI;
             EditorApplication.update -= OnCustomUpdate;
             EditorApplication.update += OnCustomUpdate;
+            EditorApplication.update -= EditorApplication.RepaintHierarchyWindow;
+            EditorApplication.update += EditorApplication.RepaintHierarchyWindow;
         }
         
         private static void OnCustomUpdate() { ranOnceThisFrame = false; }
