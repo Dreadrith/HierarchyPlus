@@ -34,6 +34,8 @@ namespace DreadScripts.HierarchyPlus
         private static GUIContent defaultContent;
         private static string iconFolderPath;
         private static Vector2 scroll;
+        private static double lastTimeCalled;
+        private static double currentTime;
 
         private static bool ranOnceThisFrame;
         private static int lastMaxIconCount;
@@ -151,6 +153,7 @@ namespace DreadScripts.HierarchyPlus
 						settings.showTransformIcon.DrawField("Show Transform Icon");
 						settings.showNonBehaviourIcons.DrawField("Show Non-Toggleable Icons");
 						settings.alwaysShowIcons.DrawField("Always Render Icons");
+						settings.autoRefresh.DrawField("Auto-Refresh Icon States");
 						settings.linkCursorOnHover.DrawField("Link Cursor On Hover");
 						settings.guiXOffset.value = EditorGUILayout.FloatField("Icons X Offset", settings.guiXOffset.value);
 						using (new GUILayout.VerticalScope())
@@ -794,11 +797,19 @@ namespace DreadScripts.HierarchyPlus
             EditorApplication.hierarchyWindowItemOnGUI = OnHierarchyItemGUI + EditorApplication.hierarchyWindowItemOnGUI;
             EditorApplication.update -= OnCustomUpdate;
             EditorApplication.update += OnCustomUpdate;
-            EditorApplication.update -= EditorApplication.RepaintHierarchyWindow;
-            EditorApplication.update += EditorApplication.RepaintHierarchyWindow;
         }
-        
-        private static void OnCustomUpdate() { ranOnceThisFrame = false; }
+
+        private static void OnCustomUpdate()
+        {
+	        ranOnceThisFrame = false;
+	        currentTime = EditorApplication.timeSinceStartup;
+
+	        if (settings.autoRefresh && currentTime - lastTimeCalled > 0.5)
+	        {
+		        EditorApplication.RepaintHierarchyWindow();
+		        lastTimeCalled = currentTime;
+	        }
+        }
 
         private static void InitializeAll()
         {
