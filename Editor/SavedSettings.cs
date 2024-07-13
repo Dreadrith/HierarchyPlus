@@ -456,6 +456,7 @@ namespace DreadScripts.HierarchyPlus
 			showNonBehaviourIcons = new SavedBool(true),
 			linkCursorOnHover = new SavedBool(false),
 			alwaysShowIcons = new SavedBool(false),
+			autoRefresh = new SavedBool(true),
 			iconBackgroundColorEnabled = new SavedBool(true),
 			iconBackgroundOverlapOnly = new SavedBool(true),
 			labelsEnabled = new SavedBool(true),
