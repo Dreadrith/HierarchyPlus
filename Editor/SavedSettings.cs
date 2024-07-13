@@ -457,15 +457,25 @@ namespace DreadScripts.HierarchyPlus
 			linkCursorOnHover = new SavedBool(false),
 			alwaysShowIcons = new SavedBool(false),
 			iconBackgroundColorEnabled = new SavedBool(true),
-			iconBackgroundOverlapOnly = new SavedBool(true);
-		
+			iconBackgroundOverlapOnly = new SavedBool(true),
+			labelsEnabled = new SavedBool(true),
+			enableLabelContextClick = new SavedBool(true),
+			tagLabelEnabled = new SavedBool(true),
+			displayUntaggedLabel = new SavedBool(false),
+			layerLabelEnabled = new SavedBool(true),
+			displayLayerIndex = new SavedBool(false),
+			displayDefaultLayerLabel = new SavedBool(false);
+
 		[SerializeField] internal SavedFloat
-			guiXOffset = new SavedFloat(0);
+			guiXOffset = new SavedFloat(0),
+			tagLabelWidth = new SavedFloat(75),
+			layerLabelWidth = new SavedFloat(75);
 
 		#endregion
 
 		internal bool GetColorsEnabled() => enabled && colorsEnabled;
 		internal bool GetIconsEnabled() => enabled && iconsEnabled;
+		internal bool GetLabelsEnabled() => enabled && labelsEnabled;
 		internal bool GetRowColoringEnabled() => (rowColoringOddEnabled || rowColoringEvenEnabled);
 	}
 }

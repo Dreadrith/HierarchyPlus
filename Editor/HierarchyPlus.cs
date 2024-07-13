@@ -35,11 +35,18 @@ namespace DreadScripts.HierarchyPlus
         private static string iconFolderPath;
         private static Vector2 scroll;
 
+        private static bool ranOnceThisFrame;
+        private static int lastMaxIconCount;
+        private static int maxIconCount;
+
         private static bool
 	        colorsFoldout = true,
 	        mainColorsFoldout,
 	        miscColorsFolddout,
 	        iconsFoldout = true,
+	        labelsFoldout,
+	        layerLabelFoldout,
+	        tagLabelFoldout,
 	        coloredItemsFoldout,
 	        hiddenIconsFoldout,
 	        rowShadingFolout;
@@ -188,6 +195,48 @@ namespace DreadScripts.HierarchyPlus
 					}
 				}
 			}
+
+			using (new GUILayout.VerticalScope(GUI.skin.box))
+			{
+				labelsFoldout = DrawFoldoutTitle("Labels", labelsFoldout, settings.labelsEnabled);
+
+				if (labelsFoldout)
+				{
+					using (new EditorGUI.DisabledScope(!settings.GetLabelsEnabled()))
+					using (new GUILayout.VerticalScope())
+					{
+						settings.enableLabelContextClick.DrawField("Enable Context Click");
+						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+						{
+							layerLabelFoldout = Foldout("Layer Label", ref layerLabelFoldout);
+							if (layerLabelFoldout)
+							{
+								using (new IndentScope())
+								{
+									settings.layerLabelEnabled.DrawField("Show Layer Label");
+									settings.displayDefaultLayerLabel.DrawField("Show Default Label");
+									settings.displayLayerIndex.DrawField("Show Layer Index");
+									settings.layerLabelWidth.value = EditorGUILayout.FloatField("Layer Label Width", settings.layerLabelWidth.value);
+								}
+							}
+						}
+						
+						using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+						{
+							tagLabelFoldout = Foldout("Tag Label", ref tagLabelFoldout);
+							if (tagLabelFoldout)
+							{
+								using (new IndentScope())
+								{
+									settings.tagLabelEnabled.DrawField("Show Tag Label");
+									settings.displayUntaggedLabel.DrawField("Show Untagged Label");
+									settings.tagLabelWidth.value = EditorGUILayout.FloatField("Tag Label Width", settings.tagLabelWidth.value);
+								}
+							}
+						}
+					}
+				}
+			}
 			
 			EditorGUILayout.EndScrollView();
 			using (new GUILayout.HorizontalScope())
@@ -230,6 +279,13 @@ namespace DreadScripts.HierarchyPlus
 
         private static void OnHierarchyItemGUI(int id, Rect rect)
         {
+	        if (!ranOnceThisFrame)
+	        {
+		        ranOnceThisFrame = true;
+		        lastMaxIconCount = maxIconCount;
+		        maxIconCount = 0;
+	        }
+
 	        DisposeOfColorScopes();
 	        if (settings.GetColorsEnabled())
 	        {
@@ -332,31 +388,34 @@ namespace DreadScripts.HierarchyPlus
 		        }
 	        }
 
+	        float nameAdjust = GUI.skin.label.CalcSize(new GUIContent(go.name)).x + 18;
+	        Rect baseRect = new Rect(rect) {width = rect.width - 32 + settings.guiXOffset - nameAdjust};
+	        baseRect.x += nameAdjust;
+
 	        if (settings.GetIconsEnabled())
 	        {
-		        float nameAdjust = GUI.skin.label.CalcSize(new GUIContent(go.name)).x + 18;
-		        Rect availableArea = new Rect(rect) {width = rect.width - 32 + settings.guiXOffset - nameAdjust};
-		        availableArea.x += nameAdjust;
-
-		        Rect iconRect = availableArea;
-		        iconRect.x = availableArea.xMax - 18;
+		        Rect availableIconArea = new Rect(baseRect);
+		        int currentIconCount = 0;
+		        Rect iconRect = availableIconArea;
+		        iconRect.x = availableIconArea.xMax - 18;
 		        iconRect.width = 18;
 
 		        bool CanDrawIcon(out bool drawBackground)
 		        {
-			        bool dotsOnly = availableArea.width < 36;
-			        bool overlapping = availableArea.width < 18;
+			        currentIconCount++;
+			        bool dotsOnly = availableIconArea.width < 36;
+			        bool overlapping = availableIconArea.width < 18;
 			        bool drawIcon = settings.alwaysShowIcons || (!dotsOnly && !overlapping);
 			        drawBackground = drawIcon && settings.colorsEnabled && settings.iconBackgroundColorEnabled && (overlapping || !settings.iconBackgroundOverlapOnly);
-			        
+
 			        if (!drawIcon && dotsOnly)
 			        {
 				        GUI.Label(iconRect, "...", EditorStyles.centeredGreyMiniLabel);
-				        availableArea.width -= 18;
+				        availableIconArea.width -= 18;
 				        return false;
 			        }
-			        
-			        availableArea.width -= 18;
+
+			        availableIconArea.width -= 18;
 			        return drawIcon;
 
 		        }
@@ -372,15 +431,15 @@ namespace DreadScripts.HierarchyPlus
 				        if (!isFirstComponent && !settings.showNonBehaviourIcons)
 					        if (!(c is Behaviour) && !(c is Renderer) && !(c is Collider))
 						        continue;
-			        
+
 				        if (isFirstComponent)
 				        {
 					        isFirstComponent = false;
-					        if (!settings.showTransformIcon) 
+					        if (!settings.showTransformIcon)
 						        continue;
 				        }
 
-			        
+
 
 				        if (!isFirstComponent && settings.hiddenIconTypes.Any(ss => ss.value == c.GetType().Name)) continue;
 			        }
@@ -398,8 +457,93 @@ namespace DreadScripts.HierarchyPlus
 				        }
 			        }
 		        }
+
+		        if (currentIconCount > maxIconCount) maxIconCount = currentIconCount;
 	        }
 
+	        if (settings.GetLabelsEnabled())
+	        {
+		        GUIStyle als = "assetlabel";
+		        Rect availableLabelsArea = baseRect;
+		        availableLabelsArea.width -= 18 * (lastMaxIconCount + 1);
+
+		        if (settings.layerLabelEnabled && (settings.displayDefaultLayerLabel || go.layer != 0))
+		        {
+			        float maxWidth = availableLabelsArea.width;
+			        float layerLabelWidth = settings.layerLabelWidth;
+			        Rect layerRect = UseRectEnd(ref availableLabelsArea, layerLabelWidth);
+			        layerRect.width = Mathf.Clamp(layerRect.width, 0, Mathf.Max(0, maxWidth));
+			        layerRect.x += layerLabelWidth - layerRect.width;
+			        if (layerRect.width > 10)
+			        {
+				        string layerName = LayerMask.LayerToName(go.layer);
+				        string label = settings.displayLayerIndex ? $"{go.layer}: {layerName}" : layerName;
+				        using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
+				        using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
+					        GUI.Label(layerRect, label, als);
+
+				        if (settings.enableLabelContextClick && RightClicked(layerRect))
+				        {
+					        var layerNames = Enumerable.Range(0, 31).Select(LayerMask.LayerToName).ToArray();
+
+					        GenericMenu layerMenu = new GenericMenu();
+					        for (int i = 0; i < layerNames.Length; i++)
+					        {
+						        var n = layerNames[i];
+						        if (!string.IsNullOrEmpty(n))
+						        {
+							        int index = i;
+							        layerMenu.AddItem(new GUIContent($"{i}: {n}"), go.layer == index, () =>
+							        {
+								        Undo.RecordObject(go, "Change Layer");
+								        go.layer = index;
+								        EditorUtility.SetDirty(go);
+							        });
+						        }
+					        }
+
+					        layerMenu.ShowAsContext();
+				        }
+			        }
+		        }
+		        else UseRectEnd(ref availableLabelsArea, settings.layerLabelWidth);
+		        
+		        if (settings.tagLabelEnabled && (settings.displayUntaggedLabel || !go.CompareTag("Untagged")))
+		        {
+			        UseRectEnd(ref availableLabelsArea, 18);
+			        float maxWidth = availableLabelsArea.width;
+			        float labelWidth = settings.tagLabelWidth;
+			        Rect tagRect = UseRectEnd(ref availableLabelsArea, labelWidth);
+			        tagRect.width = Mathf.Clamp(tagRect.width, 0, Mathf.Max(0, maxWidth));
+			        if (tagRect.width > 10)
+			        {
+				        tagRect.x += labelWidth - tagRect.width;
+				        string tagName = go.tag;
+				        using (new ColoredScope(ColoredScope.ColoringType.BG, new Color(0, 0, 0, 0.4f)))
+				        using (new ColoredScope(ColoredScope.ColoringType.FG, new Color(0.7f, 0.7f, 0.7f)))
+					        GUI.Label(tagRect, tagName, "assetlabel");
+
+				        if (settings.enableLabelContextClick && RightClicked(tagRect))
+				        {
+					        var tagNames = UnityEditorInternal.InternalEditorUtility.tags;
+
+					        GenericMenu tagMenu = new GenericMenu();
+					        foreach (var n in tagNames)
+					        {
+						        if (string.IsNullOrEmpty(n)) continue;
+						        tagMenu.AddItem(new GUIContent(n), go.CompareTag(n), () =>
+						        {
+							        Undo.RecordObject(go, "Change Tag");
+							        go.tag = n;
+							        EditorUtility.SetDirty(go);
+						        });
+					        }
+
+					        tagMenu.ShowAsContext();
+				        }
+			        }
+		        }
+	        }
         }
 
         private static void DisposeOfColorScopes()
@@ -411,6 +555,15 @@ namespace DreadScripts.HierarchyPlus
         #endregion
 
         #region Drawing Helpers
+
+        internal static Rect UseRectEnd(ref Rect rect, float width)
+        {
+	        var returnRect = rect;
+	        rect.width -= width;
+	        returnRect.x = rect.xMax;
+	        returnRect.width = width;
+	        return returnRect;
+        }
         
         internal static void MakeRectLinkCursor(Rect rect = default)
         {
@@ -639,8 +792,12 @@ namespace DreadScripts.HierarchyPlus
             InitializeAll();
             EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyItemGUI;
             EditorApplication.hierarchyWindowItemOnGUI = OnHierarchyItemGUI + EditorApplication.hierarchyWindowItemOnGUI;
+            EditorApplication.update -= OnCustomUpdate;
+            EditorApplication.update += OnCustomUpdate;
         }
         
+        private static void OnCustomUpdate() { ranOnceThisFrame = false; }
+
         private static void InitializeAll()
         {
 	        iconCache.Clear();
