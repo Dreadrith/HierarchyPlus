@@ -249,7 +249,10 @@ namespace DreadScripts.HierarchyPlus
 			}
 
 			if (EditorGUI.EndChangeCheck())
+			{
 				EditorApplication.RepaintHierarchyWindow();
+				CheckAutoRefresh();
+			}
 		}
     
 		private static void w_Credit()
@@ -797,14 +800,22 @@ namespace DreadScripts.HierarchyPlus
             EditorApplication.hierarchyWindowItemOnGUI = OnHierarchyItemGUI + EditorApplication.hierarchyWindowItemOnGUI;
             EditorApplication.update -= OnCustomUpdate;
             EditorApplication.update += OnCustomUpdate;
+            CheckAutoRefresh();
         }
 
-        private static void OnCustomUpdate()
+        private static void OnCustomUpdate() {ranOnceThisFrame = false;}
+
+        private static void CheckAutoRefresh()
         {
-	        ranOnceThisFrame = false;
+	        EditorApplication.update -= AutoRefresh;
+	        if (settings.autoRefresh) {EditorApplication.update += AutoRefresh;}
+        }
+        
+        private static void AutoRefresh()
+        {
 	        currentTime = EditorApplication.timeSinceStartup;
 
-	        if (settings.autoRefresh && currentTime - lastTimeCalled > 0.5)
+	        if (currentTime - lastTimeCalled > 0.5)
 	        {
 		        EditorApplication.RepaintHierarchyWindow();
 		        lastTimeCalled = currentTime;
